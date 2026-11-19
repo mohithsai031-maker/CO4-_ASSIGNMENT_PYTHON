@@ -1,0 +1,70 @@
+def read_attendance(lines):
+    records = []
+
+    for line in lines:
+        parts = line.strip().split(",")
+
+        if len(parts) == 3:
+            records.append(tuple(parts))
+
+    return records
+
+
+def percentage(records):
+    result = {}
+
+    for reg, date, status in records:
+        if reg not in result:
+            result[reg] = {"P": 0, "A": 0}
+
+        if status in ("P", "A"):
+            result[reg][status] += 1
+
+    percentages = {}
+
+    for reg, data in result.items():
+        total = data["P"] + data["A"]
+
+        percentages[reg] = (
+            data["P"] / total * 100 if total else 0
+        )
+
+    return percentages
+
+
+def write_report(data):
+    with open("report.txt", "w") as f:
+        for reg, percent in data.items():
+            f.write(f"{reg}: {percent:.2f}%\n")
+
+
+def three_day_absences(records):
+    result = {}
+
+    for reg, date, status in records:
+        result.setdefault(reg, []).append(status)
+
+    return [
+        reg for reg, days in result.items()
+        if len(days) >= 3 and days[-3:] == ["A", "A", "A"]
+    ]
+
+
+if __name__ == "__main__":
+
+    sample = [
+        "101,2026-11-01,P",
+        "101,2026-11-02,A",
+        "101,2026-11-03,A",
+        "102,2026-11-01,A",
+        "102,2026-11-02,A",
+        "102,2026-11-03,A"
+    ]
+
+    records = read_attendance(sample)
+    result = percentage(records)
+
+    write_report(result)
+
+    print(result)
+    print(three_day_absences(records))
