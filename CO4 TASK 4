@@ -1,0 +1,48 @@
+def save_returns(books):
+    with open("returns.log", "a", encoding="utf-8") as f:
+        for book in books:
+            f.write(book + "\n")
+
+
+def process(day_file):
+
+    try:
+        with open(day_file, "r", encoding="utf-8") as f:
+            books = f.read().splitlines()
+
+        save_returns(books)
+
+    except FileNotFoundError as e:
+        with open("errors.log", "a", encoding="utf-8") as log:
+            log.write(str(e) + "\n")
+
+        print("Missing file")
+
+
+if __name__ == "__main__":
+
+    with open("returns.log", "w") as f:
+        f.write("")
+
+    with open("day1.txt", "w") as f:
+        f.write("Book A\nBook B\n")
+
+    with open("day2.txt", "w") as f:
+        f.write("Book C\n")
+
+    with open("day3.txt", "w") as f:
+        f.write("Book D\nBook E\n")
+
+    process("day1.txt")
+    process("day2.txt")
+    process("day3.txt")
+
+    process("missing.txt")
+
+    with open("returns.log", "r") as f:
+        print("RETURNED BOOKS:")
+        print(f.read())
+
+    with open("errors.log", "r") as f:
+        print("ERRORS:")
+        print(f.read())
