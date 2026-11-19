@@ -1,0 +1,13 @@
+from pathlib import Path
+
+def read_file(filename):
+    try:
+        with open(filename, "r", encoding="utf-8") as f:
+            return list(enumerate(f, start=1)), None
+
+    except (FileNotFoundError, PermissionError, OSError) as e:
+        return [], str(e)
+
+
+def list_files(folder):
+    return sorted(Path(folder).glob("*.txt"))
