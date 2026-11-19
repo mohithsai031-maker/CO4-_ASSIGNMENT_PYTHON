@@ -1,0 +1,48 @@
+def total_mess_bills(filename):
+    total = 0.0
+    report = []
+    rejected = []
+
+    try:
+        with open(filename, "r", encoding="utf-8") as f:
+            for line_no, line in enumerate(f, start=1):
+                if not line.strip():
+                    continue
+
+                try:
+                    parts = line.strip().split(",")
+
+                    if len(parts) != 3:
+                        raise ValueError("Invalid number of fields")
+
+                    reg_no, name, amount = parts
+                    amount = float(amount)
+
+                    total += amount
+                    report.append(f"{name} {amount:.2f}")
+
+                except ValueError as e:
+                    rejected.append(f"Line {line_no}: {line.strip()}")
+
+    except FileNotFoundError:
+        print("File not found")
+        return
+
+    print("MESS BILL REPORT")
+    print("\n".join(report))
+    print("Total:", total)
+
+    print("\nRejected Lines:")
+    print("\n".join(rejected))
+
+
+if __name__ == "__main__":
+    with open("mess_oct.txt", "w") as f:
+        f.write(
+            "192311001,Ravi,1250.50\n"
+            "192311002,Anu,980\n"
+            "192311003,Kiran,abc\n"
+            "192311004,Meena,1450.75\n"
+        )
+
+    total_mess_bills("mess_oct.txt")
