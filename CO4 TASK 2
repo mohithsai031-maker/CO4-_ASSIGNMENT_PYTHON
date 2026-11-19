@@ -1,0 +1,80 @@
+import os
+from pathlib import Path
+
+def create_files():
+    folder = Path("attendance")
+    folder.mkdir(exist_ok=True)
+
+    (folder / "day1.txt").write_text(
+        "192311001,2026-11-01,P\n"
+        "192311002,2026-11-01,A\n"
+        "192311003,2026-11-01,P\n"
+    )
+
+    (folder / "day2.txt").write_text(
+        "192311001,2026-11-02,P\n"
+        "192311002,2026-11-02,P\n"
+        "192311003,2026-11-02,L\n"
+    )
+
+    return folder
+
+
+def process_attendance(folder):
+    attendance = {}
+    rejected = []
+
+    for filename in folder.glob("*.txt"):
+        with open(filename, "r", encoding="utf-8") as f:
+
+            for line_no, line in enumerate(f, start=1):
+                if not line.strip():
+                    continue
+
+                parts = line.strip().split(",")
+
+                if len(parts) != 3:
+                    rejected.append(
+                        f"{filename.name}, line {line_no}: {line.strip()}"
+                    )
+                    continue
+
+                reg, date, status = parts
+
+                if status not in ("P", "A"):
+                    rejected.append(
+                        f"{filename.name}, line {line_no}: {line.strip()}"
+                    )
+                    continue
+
+                if reg not in attendance:
+                    attendance[reg] = {"P": 0, "A": 0}
+
+                attendance[reg][status] += 1
+
+    with open("attendance_report.txt", "w") as f:
+        for reg, data in attendance.items():
+            total = data["P"] + data["A"]
+            percentage = data["P"] / total * 100
+
+            f.write(
+                f"{reg}: {percentage:.2f}%\n"
+            )
+
+    with open("below_75.txt", "w") as f:
+        for reg, data in attendance.items():
+            total = data["P"] + data["A"]
+            percentage = data["P"] / total * 100
+
+            if percentage < 75:
+                f.write(f"{reg}: {percentage:.2f}%\n")
+
+    with open("damaged_lines.txt", "w") as f:
+        f.write("\n".join(rejected))
+
+    print("Attendance processing completed.")
+    print(attendance)
+
+
+folder = create_files()
+process_attendance(folder)
